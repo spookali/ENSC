@@ -72,7 +72,7 @@ int* check_clause(int** arr, int nbvar, int nbclause)
 
 int main()
 {
-	ifstream dimac("DIMAC.txt", 1);
+	ifstream dimac("DIMAC.txt");
 	
 	string p; //ignore variable
 	string cnf;
@@ -153,7 +153,7 @@ int main()
 	{
 		cout << solution[i];
 	}
-
+	cout << endl << "Please press any key and then enter ";
 	int x; std::cin >> x;
 	dimac.close();
 	return 0;
