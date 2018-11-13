@@ -17,3 +17,8 @@ To remove this commit and modify the file, use 'git reset --soft HEAD~1' and com
 
 # Pushes the changes in your local repository up to the remote repository you specified as the origin
 
+
+To get files not in local repository
+
+	$ git pull origin
+	$ git pull origin master
