@@ -5,6 +5,10 @@
 #include <functional> //for negation
 using namespace std;
 
+//Arrays will hold variables in their i-1 positions
+//the variable 1 will be stored in 0th cell, 2 in 1st..
+
+
 int* generate_clauses(int nbvar)
 {	//generate a random set of values 
 	int* arr = new int[nbvar];
