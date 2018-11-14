@@ -1,0 +1,169 @@
+        -:    0:Source:A5.cpp
+        -:    0:Graph:A5.gcno
+        -:    0:Data:A5.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include <iostream>
+        -:    2:#include <fstream>
+        -:    3:#include <cstdlib>
+        -:    4:#include <string>
+        -:    5:#include <functional> //for negation
+        -:    6:using namespace std;
+        -:    7:
+        -:    8://Arrays will hold variables in their i-1 positions
+        -:    9://the variable 1 will be stored in 0th cell, 2 in 1st..
+        -:   10:
+        -:   11:
+        3:   12:int* generate_clauses(int nbvar)
+        -:   13:{	//generate a random set of values 
+        3:   14:	int* arr = new int[nbvar];
+        3:   15:	int negative = 0;
+       18:   16:	for (int i = 0; i < nbvar; i++)
+        -:   17:	{
+       15:   18:		arr[i] = i + 1;
+       15:   19:		negative = rand() % 2;
+       15:   20:		if (negative == 0)
+        -:   21:		{
+        5:   22:			arr[i] = arr[i] * (-1);
+        -:   23:		}
+       15:   24:		cout << arr[i];
+        -:   25:	}
+        3:   26:	cout << endl;
+        3:   27:	return arr;
+        -:   28:}
+        -:   29:
+        3:   30:int* check_clause(int** arr, int nbvar, int nbclause)
+        -:   31:{
+        3:   32:	int* random = generate_clauses(nbvar);
+        3:   33:	int* clause_checker = new int[nbclause];
+        -:   34:
+        -:   35:	//compare each individual clause and then recursively check the next clause
+        -:   36:	//arr will hold the clauses
+        -:   37:
+       15:   38:	for (int i = 0; i < nbclause; i++)
+        -:   39:	{
+       39:   40:		for (int j = 0; j < nbvar; j++)
+        -:   41:		{
+       36:   42:			if (arr[i][j] == random[j])
+        -:   43:			{
+        9:   44:				clause_checker[i] = 1;
+        9:   45:				break;
+        -:   46:			}
+        -:   47:			else
+        -:   48:			{
+       27:   49:				if (clause_checker[i] == 1)
+        -:   50:				{}
+        -:   51:				else
+        -:   52:				{
+       25:   53: 					clause_checker[i] = 0;
+        -:   54:				}
+        -:   55:			}
+        -:   56:		}
+        -:   57:	}
+        -:   58:
+        3:   59:	int sum = 0;
+       15:   60:	for (int i = 0; i < nbclause; i++)
+        -:   61:	{
+       12:   62:		sum += clause_checker[i];
+        -:   63:	}
+        -:   64:
+        3:   65:	if (sum == nbclause)
+        -:   66:	{
+        1:   67:		return random;
+        -:   68:	}
+        -:   69:	else
+        -:   70:	{
+        2:   71:		delete[] clause_checker;
+        2:   72:		delete[] random;
+        2:   73:		return check_clause(arr, nbvar, nbclause);
+        -:   74:	}
+        -:   75:}
+        -:   76:
+        1:   77:int main()
+        -:   78:{
+        2:   79:	ifstream dimac("DIMAC.txt");
+        -:   80:	
+        2:   81:	string p; //ignore variable
+        2:   82:	string cnf;
+        1:   83:	int nbvar = 0;
+        1:   84:	int nbclauses = 0;
+        -:   85:
+        7:   86:	while (p != "p")
+        -:   87:	{
+        3:   88:		dimac >> p;
+        3:   89:		if (p[0] == 'c')
+        -:   90:		{
+        2:   91:			getline(dimac, p);
+        -:   92:			/*cout << "comment line" << endl;
+        -:   93:			cout << p << endl;*/
+        -:   94:		}
+        -:   95:		else
+        -:   96:		{
+        1:   97:			dimac >> cnf;
+        -:   98:			//cout << p << " " << cnf << endl;
+        -:   99:		}
+        -:  100:	}
+        -:  101:
+        1:  102:	dimac >> nbvar;
+        1:  103:	dimac >> nbclauses;	
+        -:  104:
+        1:  105:	cout << nbvar << endl;
+        1:  106:	cout << nbclauses << endl;
+        -:  107:
+        -:  108:	//in order to grab the necessary clauses from dimac file
+        1:  109:	int** variables = new int*[nbclauses];
+        6:  110:	for (int i = 0; i < nbvar; i++)
+        -:  111:	{
+        5:  112:		variables[i] = new int[nbvar];
+       30:  113:		for (int j = 0; j < nbvar; j++) //initialize variables beforehand
+        -:  114:		{
+       25:  115:			variables[i][j] = NULL;
+        -:  116:		}
+        -:  117:	}
+        -:  118:	
+        -:  119:	//storing values into clause array
+        1:  120:	int temp = 0;
+        5:  121:	for (int i = 0; i < nbclauses; i++)
+        -:  122:	{
+       23:  123:		for (int j = 0; j < nbvar; j++)
+        -:  124:		{
+       20:  125:			dimac >> variables[i][j];
+       20:  126:			if (abs(variables[i][j]) != j + 1)
+        -:  127:			{
+        8:  128:				if (variables[i][j] == 0)
+        -:  129:				{
+        1:  130:					variables[i][j] = NULL;
+        1:  131:					break;
+        -:  132:				}
+        7:  133:				if (variables[i][j] < 0)
+        -:  134:				{
+        5:  135:					dimac.seekg(-2, dimac.cur);
+        5:  136:					variables[i][j] = NULL;
+        -:  137:				}
+        -:  138:				else
+        -:  139:				{
+        2:  140:					dimac.seekg(-1, dimac.cur);
+        2:  141:					variables[i][j] = NULL;
+        -:  142:				}
+        -:  143:			}
+       19:  144:			if (j == nbvar-1)
+        -:  145:			{
+        3:  146:				getline(dimac, p);
+        -:  147:			}
+        -:  148:		}
+        4:  149:		if (dimac.peek() == '\n' || dimac.peek() == 0 || dimac.peek() == '0')
+        -:  150:		{
+    #####:  151:			getline(dimac, p);
+        -:  152:		}
+        -:  153:	}
+        -:  154:
+        1:  155:	int* solution = check_clause(variables, nbvar, nbclauses);
+        6:  156:	for (int i = 0; i < nbvar; i++)
+        -:  157:	{
+        5:  158:		cout << solution[i];
+        -:  159:	}
+        1:  160:	cout << endl << "Please press any key and then enter ";
+        1:  161:	int x; std::cin >> x;
+        1:  162:	dimac.close();
+        1:  163:	return 0;
+        3:  164:}
